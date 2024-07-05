@@ -11,8 +11,8 @@ const RIGHT: f32 = LEFT + WIDTH;
 const BOTTOM: f32 = -HEIGHT / 2.0;
 const _TOP: f32 = BOTTOM + HEIGHT;
 
-const CLOUD_WIDTH: f32 = 66.0;
-const CLOUD_HEIGHT: f32 = 20.0;
+const CLOUD_WIDTH: u32 = 66;
+const CLOUD_HEIGHT: u32 = 20;
 
 const PILLAR_WIDTH: f32 = 21.0;
 const PILLAR_HEIGHT: f32 = 482.0;
@@ -64,7 +64,7 @@ fn main() {
         })
         .add_systems(Startup, setup)
         .add_systems(Startup, (spawn_bird, spawn_clouds).after(setup))
-        .add_systems(Update, bevy::window::close_on_esc)
+        .add_systems(Update, close_on_esc)
         .add_systems(Update, on_press)
         .add_systems(
             Update,
@@ -119,7 +119,7 @@ fn setup(
     commands.insert_resource(Textures {
         bird: asset_server.load("flappin-bird.png"),
         bird_layout: atlas_layouts.add(TextureAtlasLayout::from_grid(
-            Vec2::new(28.0, 23.0),
+            UVec2::new(28, 23),
             4,
             1,
             None,
@@ -128,7 +128,7 @@ fn setup(
         pillars: asset_server.load("flappin-pillars.png"),
         clouds: asset_server.load("flappin-clouds.png"),
         clouds_layout: atlas_layouts.add(TextureAtlasLayout::from_grid(
-            Vec2::new(CLOUD_WIDTH, CLOUD_HEIGHT),
+            UVec2::new(CLOUD_WIDTH, CLOUD_HEIGHT),
             4,
             1,
             None,
@@ -418,6 +418,23 @@ fn animate_clouds(
         }
     }
 }
+
+pub fn close_on_esc(
+    mut commands: Commands,
+    focused_windows: Query<(Entity, &Window)>,
+    input: Res<ButtonInput<KeyCode>>,
+) {
+    for (window, focus) in focused_windows.iter() {
+        if !focus.focused {
+            continue;
+        }
+
+        if input.just_pressed(KeyCode::Escape) {
+            commands.entity(window).despawn();
+        }
+    }
+}
+
 
 // UTILITIES //////////////////////////////////////////////////////////////////
 
