@@ -10,7 +10,7 @@ fn main() {
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(PixelCameraPlugin)
         .add_systems(Startup, setup)
-        .add_systems(Update, bevy::window::close_on_esc)
+        .add_systems(Update, close_on_esc)
         .run();
 }
 
@@ -78,4 +78,20 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         )),
         ..Default::default()
     });
+}
+
+pub fn close_on_esc(
+    mut commands: Commands,
+    focused_windows: Query<(Entity, &Window)>,
+    input: Res<ButtonInput<KeyCode>>,
+) {
+    for (window, focus) in focused_windows.iter() {
+        if !focus.focused {
+            continue;
+        }
+
+        if input.just_pressed(KeyCode::Escape) {
+            commands.entity(window).despawn();
+        }
+    }
 }

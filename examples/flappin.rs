@@ -11,8 +11,8 @@ const RIGHT: f32 = LEFT + WIDTH;
 const BOTTOM: f32 = -HEIGHT / 2.0;
 const _TOP: f32 = BOTTOM + HEIGHT;
 
-const CLOUD_WIDTH: u32 = 66;
-const CLOUD_HEIGHT: u32 = 20;
+const CLOUD_WIDTH: f32 = 66.0;
+const CLOUD_HEIGHT: f32 = 20.0;
 
 const PILLAR_WIDTH: f32 = 21.0;
 const PILLAR_HEIGHT: f32 = 482.0;
@@ -128,7 +128,7 @@ fn setup(
         pillars: asset_server.load("flappin-pillars.png"),
         clouds: asset_server.load("flappin-clouds.png"),
         clouds_layout: atlas_layouts.add(TextureAtlasLayout::from_grid(
-            UVec2::new(CLOUD_WIDTH, CLOUD_HEIGHT),
+            UVec2::new(CLOUD_WIDTH as u32, CLOUD_HEIGHT as u32),
             4,
             1,
             None,
@@ -384,18 +384,18 @@ fn spawn_clouds(mut commands: Commands, textures: Res<Textures>, mut rng: ResMut
         let y = BOTTOM + 40.0 + rng.rand_range(0..(HEIGHT - 80.0 - CLOUD_HEIGHT) as u32) as f32;
         commands.spawn((
             Cloud,
-            SpriteSheetBundle {
+            SpriteBundle {
                 texture: textures.clouds.clone(),
-                atlas: TextureAtlas {
-                    layout: textures.clouds_layout.clone(),
-                    index: rng.rand_range(0..4) as usize,
-                },
                 transform: Transform::from_xyz(x, y, 0.0),
                 sprite: Sprite {
                     anchor: Anchor::BottomLeft,
                     ..Default::default()
                 },
                 ..Default::default()
+            },
+            TextureAtlas {
+                layout: textures.clouds_layout.clone(),
+                index: rng.rand_range(0..4) as usize,
             },
         ));
         x += CLOUD_WIDTH;
@@ -434,7 +434,6 @@ pub fn close_on_esc(
         }
     }
 }
-
 
 // UTILITIES //////////////////////////////////////////////////////////////////
 
